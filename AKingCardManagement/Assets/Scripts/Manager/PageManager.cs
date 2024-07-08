@@ -14,19 +14,25 @@ namespace AKingCard
     }
     public class PageManager : MonoBehaviour
     {
+
+        public static PageManager instance {private set; get;}
+        PageManager()
+        {
+            instance = this;
+        }
         public Transform pageStart;
-        public Transform pageTemplateManage;
+        public PageTemplateManage pageTemplateManage;
         public Transform pageCardManage;
-        public Transform pageTemplateEdit;
+        public PageTemplateEdit pageTemplateEdit;
         public Transform pageCardEdit;
         private Dictionary<PageType,Transform> pages = new Dictionary<PageType, Transform>();
 
         void Start()
         {
             pages.Add(PageType.StartPage, pageStart);
-            pages.Add(PageType.TemplateManagePage, pageTemplateManage);
+            pages.Add(PageType.TemplateManagePage, pageTemplateManage.transform);
             pages.Add(PageType.CardManagePage, pageCardManage);
-            pages.Add(PageType.TemplateEditPage, pageTemplateEdit);
+            pages.Add(PageType.TemplateEditPage, pageTemplateEdit.transform);
             pages.Add(PageType.CardEditPage, pageCardEdit);
             foreach(var page in pages)
             {

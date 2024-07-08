@@ -11,10 +11,10 @@ namespace AKingCard
     public class ListItemTemplate : MonoBehaviour
     {
         public TextMeshProUGUI textName;
-        private CardTemplate thisData = new CardTemplate("-", Vector2.one);
-        private UnityAction<CardTemplate> onClickAction;
+        private DataTemplate thisData = new DataTemplate("-", Vector2.one);
+        private UnityAction<DataTemplate> onClickAction;
         private Button thisButton;
-        public void Init(CardTemplate data, UnityAction<CardTemplate> OnClickAction)
+        public void Init(DataTemplate data, UnityAction<DataTemplate> OnClickAction)
         {
             thisData = data;
             onClickAction = OnClickAction;
