@@ -11,6 +11,8 @@ public class PrefabManager : MonoBehaviour
     }
     public GameObject ListItemCard;
     public GameObject ListItemTemplate;
+    public GameObject ListItemImage;
+    public GameObject ListItemText;
     public GameObject PreviewItem;
     public GameObject PreviewRoot;
 }

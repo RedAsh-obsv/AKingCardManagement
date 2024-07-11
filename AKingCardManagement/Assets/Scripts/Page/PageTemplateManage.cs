@@ -60,8 +60,8 @@ namespace AKingCard
             Debug.Log($"[{LogTag}] ShowAlertAdd");
             alertAdd.gameObject.SetActive(true);
             inputName.SetTextWithoutNotify("");
-            inputWidth.SetTextWithoutNotify("");
-            inputHeight.SetTextWithoutNotify("");
+            inputWidth.SetTextWithoutNotify("600");
+            inputHeight.SetTextWithoutNotify("800");
             toastWarning.Play("TemplateAlertAddToastHide", 0, 0);
         }
         public void HideAlertAdd()
@@ -88,7 +88,7 @@ namespace AKingCard
             }
             if (!intReg.IsMatch(inputWidth.text))
             {
-                toastWarningText.SetText("宽度必须为正整数(像素数)");
+                toastWarningText.SetText("宽度必须为正整数(像素)");
                 LayoutRebuilder.ForceRebuildLayoutImmediate(toastWarningRect);
                 toastWarning.Play("TemplateAlertAddToastClosing", 0, 0);
                 return;
@@ -102,7 +102,7 @@ namespace AKingCard
             }
             if (!intReg.IsMatch(inputHeight.text))
             {
-                toastWarningText.SetText("高度必须为正整数(像素数)");
+                toastWarningText.SetText("高度必须为正整数(像素)");
                 LayoutRebuilder.ForceRebuildLayoutImmediate(toastWarningRect);
                 toastWarning.Play("TemplateAlertAddToastClosing", 0, 0);
                 return;
@@ -117,8 +117,8 @@ namespace AKingCard
         {
             Debug.Log($"[{LogTag}] CreateNewListItem");
             DataTemplate newData = new DataTemplate(UnityWebRequest.EscapeURL(Name), new Vector2(width, height));
-            newData.cardItems.Add(new CardItemImage(1, "test", new Vector2(100, 100), new Vector2(100, 100)));
-            newData.cardItems.Add(new CardItemImage(2, "test2", new Vector2(200, 200), new Vector2(400, 400)));
+            newData.cardItems.Add(new CardItemImage(newData, 1, "test", new Vector2(100, 100), new Vector2(100, 100)));
+            newData.cardItems.Add(new CardItemImage(newData, 2, "test2", new Vector2(200, 200), new Vector2(300, 300)));
             cardTemplates.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemTemplate, scrollContent);
             newObject.transform.SetAsFirstSibling();

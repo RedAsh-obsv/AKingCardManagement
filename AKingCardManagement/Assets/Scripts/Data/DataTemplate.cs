@@ -12,11 +12,11 @@ namespace AKingCard
         public List<CardItem> cardItems { private set; get; }
         public DataTemplate(string name, Vector2 size)
         {
-            this.index = (DateTime.Now.Ticks * 1000);
+            this.index = DateTime.Now.Ticks;
             this.name = name;
             this.size = size;
             cardItems = new List<CardItem>();
-            cardItems.Add(new CardItemImage(0, "Background", size, Vector2.zero));
+            cardItems.Add(new CardItemImage(this, 0, "Background", size, Vector2.zero));
         }
 
         public bool Equals(DataTemplate otherTemplate)

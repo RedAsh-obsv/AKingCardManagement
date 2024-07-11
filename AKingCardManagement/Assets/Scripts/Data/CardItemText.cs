@@ -8,8 +8,9 @@ namespace AKingCard
     public class CardItemText : CardItem
     {
         private Text textView;
-        public CardItemText(long index, string name, Vector2 size, Vector2 position)
+        public CardItemText(DataTemplate template, long index, string name, Vector2 size, Vector2 position)
         {
+            this.template = template;
             this.index = index;
             this.name = name;
             this.size = size;
