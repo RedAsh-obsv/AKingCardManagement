@@ -31,7 +31,7 @@ namespace AKingCard
         private DataTemplate currentTemplate;
         void Start()
         {
-            Debug.Log($"[{LogTag}] Start");
+            LogManager.Log($"[{LogTag}] Start");
             alertAdd.gameObject.SetActive(false);
             previewTextTitle.text = "-";
             previewTextSize.text = $"- x -";
@@ -42,7 +42,7 @@ namespace AKingCard
         }
         public void InitEdit()
         {
-            Debug.Log($"[{LogTag}] InitEdit");
+            LogManager.Log($"[{LogTag}] InitEdit");
             if (currentTemplate == null)
             {
                 toastWarningText.SetText("必须选择一个模板");
@@ -57,7 +57,7 @@ namespace AKingCard
         }
         public void ShowAlertAdd()
         {
-            Debug.Log($"[{LogTag}] ShowAlertAdd");
+            LogManager.Log($"[{LogTag}] ShowAlertAdd");
             alertAdd.gameObject.SetActive(true);
             inputName.SetTextWithoutNotify("");
             inputWidth.SetTextWithoutNotify("600");
@@ -66,12 +66,12 @@ namespace AKingCard
         }
         public void HideAlertAdd()
         {
-            Debug.Log($"[{LogTag}] HideAlertAdd");
+            LogManager.Log($"[{LogTag}] HideAlertAdd");
             alertAdd.gameObject.SetActive(false);
         }
         public void ConfirmAlertAdd()
         {
-            Debug.Log($"[{LogTag}] ConfirmAlertAdd");
+            LogManager.Log($"[{LogTag}] ConfirmAlertAdd");
             if (string.IsNullOrEmpty(inputName.text))
             {
                 toastWarningText.SetText("模板名不能为空");
@@ -115,7 +115,7 @@ namespace AKingCard
 
         private void CreateNewListItem(string Name, int width, int height)
         {
-            Debug.Log($"[{LogTag}] CreateNewListItem");
+            LogManager.Log($"[{LogTag}] CreateNewListItem");
             DataTemplate newData = new DataTemplate(UnityWebRequest.EscapeURL(Name), new Vector2(width, height));
             newData.cardItems.Add(new CardItemImage(newData, 1, "test", new Vector2(100, 100), new Vector2(100, 100)));
             newData.cardItems.Add(new CardItemImage(newData, 2, "test2", new Vector2(200, 200), new Vector2(300, 300)));
@@ -129,7 +129,7 @@ namespace AKingCard
 
         private void OnClickListItem(DataTemplate itemData)
         {
-            Debug.Log($"[{LogTag}] OnClickListItem");
+            LogManager.Log($"[{LogTag}] OnClickListItem");
             currentTemplate = itemData;
             previewTextTitle.text = UnityWebRequest.UnEscapeURL(itemData.name);
             previewTextSize.text = $"{itemData.size.x} x {itemData.size.y}";
@@ -138,7 +138,7 @@ namespace AKingCard
         
         private void CreateNewTemplatePreView(DataTemplate data)
         {
-            Debug.Log($"[{LogTag}] CreateNewTemplatePreView");
+            LogManager.Log($"[{LogTag}] CreateNewTemplatePreView");
             if (previewParent.childCount != 0)
             {
                 foreach(Transform child in previewParent)

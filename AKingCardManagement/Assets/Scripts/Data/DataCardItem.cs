@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace AKingCard
 {
-    public class CardItem
+    public class DataCardItem
     {
         public DataTemplate template;
         public long index;
@@ -12,7 +12,7 @@ namespace AKingCard
         public Vector2 size = Vector2.one;
         public Vector2 position = Vector2.zero;
         public string content;
-        public bool Equals(DataTemplate template, CardItem otherTemplate)
+        public bool Equals(DataTemplate template, DataCardItem otherTemplate)
         {
             if (otherTemplate.template.index != template.index) return false;
             if (otherTemplate.index != index) return false;

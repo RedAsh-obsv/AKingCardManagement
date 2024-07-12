@@ -21,6 +21,7 @@ namespace AKingCard
         public PageManager pageManager;
         public Transform alertBack;
         public Transform scrollContent;
+        public Transform scrollContentHighlight;
         public RectTransform previewParent;
         public RectTransform previewRoot;
         public TextMeshProUGUI previewTextTitle;
@@ -49,11 +50,12 @@ namespace AKingCard
         private CardItemType addingItemType = CardItemType.Image;
 
         private DataTemplate currentTemplate;
+        private Dictionary<long, KeyValuePair<ListItemEdit, PreviewItem>> UIItemPairs = new Dictionary<long, KeyValuePair<ListItemEdit, PreviewItem>>();
         private bool changeHasSaved = false;
         private DateTime changeTimer;
         void Start()
         {
-            Debug.Log($"[{LogTag}] Start");
+            LogManager.Log($"[{LogTag}] Start");
             alertBack.gameObject.SetActive(false);
             alertAdd.gameObject.SetActive(false);
             previewTextTitle.text = "-";
@@ -72,28 +74,27 @@ namespace AKingCard
 
         public void Init(DataTemplate data)
         {
-            Debug.Log($"[{LogTag}] Init");
+            LogManager.Log($"[{LogTag}] Init");
             CreateNewTemplatePreView(data);
             LoadSavedListItems(data);
             previewTextTitle.text = UnityWebRequest.UnEscapeURL(data.name);
             previewTextSize.text = $"{data.size.x} x {data.size.y}";
             ConfigPanel.SetActive(false);
             currentTemplate = data;
-
         } 
         public void ShowAlertBack()
         {
-            Debug.Log($"[{LogTag}] ShowAlertBack");
+            LogManager.Log($"[{LogTag}] ShowAlertBack");
             alertBack.gameObject.SetActive(true);
         }
         public void HideAlertBack()
         {
-            Debug.Log($"[{LogTag}] HideAlertBack");
+            LogManager.Log($"[{LogTag}] HideAlertBack");
             alertBack.gameObject.SetActive(false);
         }
         public void CheckBack()
         {
-            Debug.Log($"[{LogTag}] CheckBack");
+            LogManager.Log($"[{LogTag}] CheckBack");
             if (changeHasSaved)
                 pageManager.OpenTemplateManagePage();
             else
@@ -101,7 +102,7 @@ namespace AKingCard
         }
         public void CheckChangeSaved()//!!
         {
-            Debug.Log($"[{LogTag}] CheckChangeSaved");
+            LogManager.Log($"[{LogTag}] CheckChangeSaved");
             if (currentTemplate.Equals(currentTemplate))
                 changeHasSaved = true;
             else
@@ -115,37 +116,34 @@ namespace AKingCard
 
         public void ShowAlertAdd()
         {
-            Debug.Log($"[{LogTag}] ShowAlertAdd");
+            LogManager.Log($"[{LogTag}] ShowAlertAdd");
             alertAdd.gameObject.SetActive(true);
             inputName.SetTextWithoutNotify("");
             inputWidth.SetTextWithoutNotify("100");
             inputHeight.SetTextWithoutNotify("100");
             addingItemType = CardItemType.Image;
-            alertAddButtonImage.Select();
             alertAddButtonHighlight.position = alertAddButtonImage.transform.position;
         }
         public void HideAlertAdd()
         {
-            Debug.Log($"[{LogTag}] HideAlertAdd");
+            LogManager.Log($"[{LogTag}] HideAlertAdd");
             alertAdd.gameObject.SetActive(false);
         }
         public void OnSelectAddingImage()
         {
-            Debug.Log($"[{LogTag}] OnSelectAddingImage");
+            LogManager.Log($"[{LogTag}] OnSelectAddingImage");
             addingItemType = CardItemType.Image;
-            alertAddButtonImage.Select();
             alertAddButtonHighlight.position = alertAddButtonImage.transform.position;
         }
         public void OnSelectAddingText()
         {
-            Debug.Log($"[{LogTag}] OnSelectAddingText");
+            LogManager.Log($"[{LogTag}] OnSelectAddingText");
             addingItemType = CardItemType.Text;
-            alertAddButtonText.Select();
             alertAddButtonHighlight.position = alertAddButtonText.transform.position;
         }
         public void ConfirmAlertAdd()
         {
-            Debug.Log($"[{LogTag}] ConfirmAlertAdd");
+            LogManager.Log($"[{LogTag}] ConfirmAlertAdd");
             if (string.IsNullOrEmpty(inputName.text))
             {
                 toastWarningText.SetText("组件名不能为空");
@@ -195,43 +193,57 @@ namespace AKingCard
         }
         private void LoadSavedListItems(DataTemplate data)
         {
-            Debug.Log($"[{LogTag}] LoadSavedListItems");
+            LogManager.Log($"[{LogTag}] LoadSavedListItems");
 
+            UIItemPairs.Clear();
+            if (scrollContent.childCount > 0)
+            {
+                foreach (Transform child in scrollContent)
+                {
+                    Destroy(child.gameObject); 
+                }
+            }
             for (int i = 0; i < data.cardItems.Count; i++)
             {
                 GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
                 newObject.transform.SetAsFirstSibling();
-                newObject.GetComponent<ListItemEditImage>().Init(data.cardItems[i], OnClickListItem);
-                newObject.GetComponent<Button>().Select();
-                CreateNewPreViewItemImage(data.cardItems[i], previewRoot);
+                ListItemEditImage newListItemEditImage = newObject.GetComponent<ListItemEditImage>();
+                newListItemEditImage.Init(data.cardItems[i], UpdateCardItemSort, OnClickListItem);
+                scrollContentHighlight.position = newObject.transform.position;
+                scrollContentHighlight.localScale = Vector3.one;
+                PreviewItem newItemPreview = CreateNewPreViewItemImage(data.cardItems[i], previewRoot);
+                UIItemPairs.Add(data.cardItems[i].index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
             }
         }
 
         private void CreateNewListItemImage(string Name, int width, int height)
         {
-            Debug.Log($"[{LogTag}] CreateNewListItemImage");
+            LogManager.Log($"[{LogTag}] CreateNewListItemImage");
             long nextIndex = currentTemplate.cardItems.Count;
             CardItemImage newData = new CardItemImage(currentTemplate, nextIndex, UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
             currentTemplate.cardItems.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
             newObject.transform.SetAsFirstSibling();
-            newObject.GetComponent<ListItemEditImage>().Init(newData, OnClickListItem);
-            newObject.GetComponent<Button>().Select();
-            CreateNewPreViewItemImage(newData, previewRoot);
+            ListItemEditImage newListItemEditImage = newObject.GetComponent<ListItemEditImage>();
+            newListItemEditImage.Init(newData, UpdateCardItemSort, OnClickListItem);
+            scrollContentHighlight.position = newObject.transform.position;
+            scrollContentHighlight.localScale = Vector3.one;
+            PreviewItem newItemPreview = CreateNewPreViewItemImage(newData, previewRoot);
+            UIItemPairs.Add(newData.index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
             OnClickListItem(newData);
         }
         private void CreateNewListItemText(string Name, int width, int height)
         {
-            Debug.Log($"[{LogTag}] CreateNewListItemText");
+            LogManager.Log($"[{LogTag}] CreateNewListItemText");
         }
-        private void OnClickListItem(CardItem itemData)
+        private void OnClickListItem(DataCardItem itemData)
         {
-            Debug.Log($"[{LogTag}] OnClickListItem");
+            LogManager.Log($"[{LogTag}] OnClickListItem");
             ShowConfigPanel(itemData);
         }
-        private void ShowConfigPanel(CardItem itemData)
+        private void ShowConfigPanel(DataCardItem itemData)
         {
-            Debug.Log($"[{LogTag}] ShowConfigPanel");
+            LogManager.Log($"[{LogTag}] ShowConfigPanel");
             ConfigPanel.SetActive(true);
             ConfigPanelTitle.text = itemData.name;
             ConfigPanelWidth.text = itemData.size.x.ToString();
@@ -242,13 +254,28 @@ namespace AKingCard
         }
         public void HideConfigPanel()
         {
-            Debug.Log($"[{LogTag}] ShowConfigPanel");
+            LogManager.Log($"[{LogTag}] ShowConfigPanel");
             ConfigPanel.SetActive(false);
+            scrollContentHighlight.localScale = Vector3.zero;
+        }
+        private void UpdateCardItemSort()
+        {
+            currentTemplate.cardItems.Clear();
+            if (scrollContent.childCount > 0)
+            {
+                foreach(Transform item in scrollContent)
+                {
+                    currentTemplate.cardItems.Add(item.GetComponent<ListItemEditImage>().thisData);
+                }
+            }
+            currentTemplate.cardItems.Reverse();
+            CreateNewTemplatePreView(currentTemplate);
+            LoadSavedListItems(currentTemplate);
         }
         private void CreateNewTemplatePreView(DataTemplate data)
         {
-            Debug.Log($"[{LogTag}] CreateNewTemplatePreView");
-            if (previewParent.childCount != 0)
+            LogManager.Log($"[{LogTag}] CreateNewTemplatePreView");
+            if (previewParent.childCount > 0)
             {
                 foreach (Transform child in previewParent)
                 {
@@ -278,7 +305,7 @@ namespace AKingCard
             }
         }
 
-        private void CreateNewPreViewItemImage(CardItem itemData, RectTransform parent)
+        private PreviewItem CreateNewPreViewItemImage(DataCardItem itemData, RectTransform parent)
         {
             GameObject newItem = Instantiate(PrefabManager.instance.PreviewItem, parent);
             RectTransform newItemRect = newItem.GetComponent<RectTransform>();
@@ -286,6 +313,7 @@ namespace AKingCard
             PreviewItem newItemPreview = newItem.GetComponent<PreviewItem>();
             newItemPreview.Init(itemData.size, itemData.position);
             newItemRect.localScale = Vector3.one;
+            return newItemPreview;
         }
     }
 }

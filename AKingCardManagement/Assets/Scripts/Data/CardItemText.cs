@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace AKingCard
 {
-    public class CardItemText : CardItem
+    public class CardItemText : DataCardItem
     {
         private Text textView;
         public CardItemText(DataTemplate template, long index, string name, Vector2 size, Vector2 position)

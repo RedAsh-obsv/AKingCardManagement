@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace AKingCard
 {
-    public class CardItemImage : CardItem
+    public class CardItemImage : DataCardItem
     {
         private RawImage imageView;
         public CardItemImage(DataTemplate template, long index, string name, Vector2 size, Vector2 position)

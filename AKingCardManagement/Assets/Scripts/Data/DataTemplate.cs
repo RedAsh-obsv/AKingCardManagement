@@ -9,13 +9,13 @@ namespace AKingCard
         public long index { private set; get; }
         public string name { private set; get; }
         public Vector2 size { private set; get; }
-        public List<CardItem> cardItems { private set; get; }
+        public List<DataCardItem> cardItems { private set; get; }
         public DataTemplate(string name, Vector2 size)
         {
             this.index = DateTime.Now.Ticks;
             this.name = name;
             this.size = size;
-            cardItems = new List<CardItem>();
+            cardItems = new List<DataCardItem>();
             cardItems.Add(new CardItemImage(this, 0, "Background", size, Vector2.zero));
         }
 
