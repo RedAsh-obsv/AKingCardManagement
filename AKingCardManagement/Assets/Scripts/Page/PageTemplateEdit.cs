@@ -21,13 +21,13 @@ namespace AKingCard
         public PageManager pageManager;
         public Transform alertBack;
         public Transform scrollContent;
-        public Transform scrollContentHighlight;
+        public RectTransform scrollContentHighlight;
         public RectTransform previewParent;
         public RectTransform previewRoot;
         public TextMeshProUGUI previewTextTitle;
         public TextMeshProUGUI previewTextSize;
         public GameObject ConfigPanel;
-        public TMP_InputField ConfigPanelTitle;
+        public TMP_InputField ConfigPanelName;
         public TMP_InputField ConfigPanelWidth;
         public TMP_InputField ConfigPanelHeight;
         public TMP_InputField ConfigPanelX;
@@ -50,6 +50,7 @@ namespace AKingCard
         private CardItemType addingItemType = CardItemType.Image;
 
         private DataTemplate currentTemplate;
+        private DataCardItem currentDataItem;
         private Dictionary<long, KeyValuePair<ListItemEdit, PreviewItem>> UIItemPairs = new Dictionary<long, KeyValuePair<ListItemEdit, PreviewItem>>();
         private bool changeHasSaved = false;
         private DateTime changeTimer;
@@ -63,12 +64,13 @@ namespace AKingCard
             changeTimer = DateTime.Now;
         }
 
-        void Update()
+        private void FixedUpdate()
         {
-            if ((changeTimer - DateTime.Now)>new TimeSpan(0,0,1))
+            if ((DateTime.Now - changeTimer) > new TimeSpan(0, 0, 1))
             {
-                CheckChangeSaved();
                 changeTimer = DateTime.Now;
+                if (currentTemplate != null && currentDataItem != null)
+                    CheckChangeSaved();
             }
         }
 
@@ -102,7 +104,7 @@ namespace AKingCard
         }
         public void CheckChangeSaved()//!!
         {
-            LogManager.Log($"[{LogTag}] CheckChangeSaved");
+            //LogManager.Log($"[{LogTag}] CheckChangeSaved");
             if (currentTemplate.Equals(currentTemplate))
                 changeHasSaved = true;
             else
@@ -209,11 +211,10 @@ namespace AKingCard
                 newObject.transform.SetAsFirstSibling();
                 ListItemEditImage newListItemEditImage = newObject.GetComponent<ListItemEditImage>();
                 newListItemEditImage.Init(data.cardItems[i], UpdateCardItemSort, OnClickListItem);
-                scrollContentHighlight.position = newObject.transform.position;
-                scrollContentHighlight.localScale = Vector3.one;
                 PreviewItem newItemPreview = CreateNewPreViewItemImage(data.cardItems[i], previewRoot);
                 UIItemPairs.Add(data.cardItems[i].index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
             }
+            scrollContentHighlight.localScale = Vector3.zero;
         }
 
         private void CreateNewListItemImage(string Name, int width, int height)
@@ -230,22 +231,25 @@ namespace AKingCard
             scrollContentHighlight.localScale = Vector3.one;
             PreviewItem newItemPreview = CreateNewPreViewItemImage(newData, previewRoot);
             UIItemPairs.Add(newData.index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
-            OnClickListItem(newData);
+            //OnClickListItem(newObject.transform, newData);
         }
         private void CreateNewListItemText(string Name, int width, int height)
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemText");
         }
-        private void OnClickListItem(DataCardItem itemData)
+        private void OnClickListItem(Transform transObj, DataCardItem itemData)
         {
             LogManager.Log($"[{LogTag}] OnClickListItem");
+            scrollContentHighlight.position = transObj.position;
+            scrollContentHighlight.localScale = Vector3.one;
+            currentDataItem = itemData;
             ShowConfigPanel(itemData);
         }
         private void ShowConfigPanel(DataCardItem itemData)
         {
             LogManager.Log($"[{LogTag}] ShowConfigPanel");
             ConfigPanel.SetActive(true);
-            ConfigPanelTitle.text = itemData.name;
+            ConfigPanelName.text = itemData.name;
             ConfigPanelWidth.text = itemData.size.x.ToString();
             ConfigPanelHeight.text = itemData.size.y.ToString();
             ConfigPanelX.text = itemData.position.x.ToString();
@@ -271,6 +275,7 @@ namespace AKingCard
             currentTemplate.cardItems.Reverse();
             CreateNewTemplatePreView(currentTemplate);
             LoadSavedListItems(currentTemplate);
+
         }
         private void CreateNewTemplatePreView(DataTemplate data)
         {
@@ -285,9 +290,9 @@ namespace AKingCard
             GameObject PreviewRootObject = Instantiate(PrefabManager.instance.PreviewRoot, previewParent);
 
             previewRoot = PreviewRootObject.GetComponent<RectTransform>();
-            previewRoot.sizeDelta = data.cardItems[0].size;
+            previewRoot.sizeDelta = data.size;
 
-            Vector2 contentSize = data.cardItems[0].size;
+            Vector2 contentSize = data.size;
             Vector2 containerSize = previewParent.sizeDelta;
             if (contentSize.x / contentSize.y > containerSize.x / containerSize.y)  //¸ü¿í
             {
@@ -307,13 +312,54 @@ namespace AKingCard
 
         private PreviewItem CreateNewPreViewItemImage(DataCardItem itemData, RectTransform parent)
         {
+            LogManager.Log($"[{LogTag}] CreateNewPreViewItemImage");
             GameObject newItem = Instantiate(PrefabManager.instance.PreviewItem, parent);
             RectTransform newItemRect = newItem.GetComponent<RectTransform>();
             newItemRect.localPosition = itemData.position;
             PreviewItem newItemPreview = newItem.GetComponent<PreviewItem>();
-            newItemPreview.Init(itemData.size, itemData.position);
+            newItemPreview.Init(itemData);
             newItemRect.localScale = Vector3.one;
             return newItemPreview;
+        }
+
+        private void UpdateConfigPanel()
+        {
+            LogManager.Log($"[{LogTag}] UpdateConfigPanel");
+
+            if (currentTemplate == null || currentDataItem == null)
+                return;
+            if (string.IsNullOrEmpty(ConfigPanelName.text))//Ãû×Ö
+                currentDataItem.name = ConfigPanelName.text;
+            else
+                ConfigPanelName.text = currentDataItem.name;
+
+            if (intReg.IsMatch(ConfigPanelWidth.text))  //¿í
+                currentDataItem.size = new Vector2(Convert.ToInt32(ConfigPanelWidth.text), currentDataItem.size.y);
+            else
+                ConfigPanelWidth.text = currentDataItem.size.x.ToString();
+
+            if (intReg.IsMatch(ConfigPanelHeight.text))  //¸ß
+                currentDataItem.size = new Vector2(currentDataItem.size.x, Convert.ToInt32(ConfigPanelHeight.text));
+            else
+                ConfigPanelHeight.text = currentDataItem.size.y.ToString();
+
+            if (intReg.IsMatch(ConfigPanelX.text))  //X
+                currentDataItem.position = new Vector2(Convert.ToInt32(ConfigPanelX.text), currentDataItem.position.y);
+            else
+                ConfigPanelX.text = currentDataItem.position.x.ToString();
+
+            if (intReg.IsMatch(ConfigPanelY.text))  //Y
+                currentDataItem.position = new Vector2(currentDataItem.position.x, Convert.ToInt32(ConfigPanelY.text));
+            else
+                ConfigPanelY.text = currentDataItem.position.y.ToString();
+
+            for(int i=0;i< currentTemplate.cardItems.Count; i++)
+            {
+                if (currentTemplate.cardItems[i].index == currentDataItem.index)
+                    currentTemplate.cardItems[i] = currentDataItem;
+            }
+            CreateNewTemplatePreView(currentTemplate);
+            LoadSavedListItems(currentTemplate);
         }
     }
 }

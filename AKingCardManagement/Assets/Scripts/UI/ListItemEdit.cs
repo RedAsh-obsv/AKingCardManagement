@@ -16,10 +16,10 @@ namespace AKingCard
         public Button buttonDown;
         public Button buttonDelete;
         public DataCardItem thisData;
-        private UnityAction<DataCardItem> onClickAction;
+        private UnityAction<Transform, DataCardItem> onClickAction;
         private UnityAction setSortAction;
         private Button thisButton;
-        public void Init(DataCardItem data, UnityAction SetSortAction, UnityAction<DataCardItem> OnClickAction)
+        public void Init(DataCardItem data, UnityAction SetSortAction, UnityAction<Transform, DataCardItem> OnClickAction)
         {
             thisData = data;
             onClickAction = OnClickAction;
@@ -34,7 +34,7 @@ namespace AKingCard
         private void OnClick()
         {
             LogManager.Log($"[{LogTag}] OnClick");
-            onClickAction?.Invoke(thisData);
+            onClickAction?.Invoke(this.transform, thisData);
         }
         private void OnClickButtonUp()
         {
@@ -49,7 +49,7 @@ namespace AKingCard
             LogManager.Log($"[{LogTag}] OnClick");
             int thisSiblingIndex = transform.GetSiblingIndex();
             int parentsChild = transform.parent.childCount;
-            if (thisSiblingIndex < parentsChild-1)
+            if (thisSiblingIndex < parentsChild - 1)
                 transform.SetSiblingIndex(thisSiblingIndex + 1);
             setSortAction.Invoke();
         }

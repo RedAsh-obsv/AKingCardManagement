@@ -1,36 +1,47 @@
+using AKingCard;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PreviewItem : MonoBehaviour
+namespace AKingCard
 {
-    private RectTransform thisRect;
-    public TextMeshProUGUI widthText;
-    public TextMeshProUGUI heightText;
-
-    public RectTransform XRect;
-    public RectTransform YRect;
-
-    public TextMeshProUGUI XText;
-    public TextMeshProUGUI YText;
-
-    void Start() { }
-    void Update() { }
-
-    public void Init(Vector2 size, Vector2 pos)
+    public class PreviewItem : MonoBehaviour
     {
-        thisRect = GetComponent<RectTransform>();
-        thisRect.sizeDelta = new Vector2(size.x, size.y);
+        private RectTransform thisRect;
+        public TextMeshProUGUI nameText;
+        public TextMeshProUGUI widthText;
+        public TextMeshProUGUI heightText;
 
-        widthText.text = size.x.ToString();
-        heightText.text = size.y.ToString();
+        public RectTransform XRect;
+        public RectTransform YRect;
 
-        XText.text = pos.x == 0 ? "" : pos.x.ToString();
-        YText.text = pos.y == 0 ? "" : pos.y.ToString();
+        public TextMeshProUGUI XText;
+        public TextMeshProUGUI YText;
 
-        XRect.sizeDelta = new Vector2(pos.x, XRect.sizeDelta.y);
-        YRect.sizeDelta = new Vector2(pos.y, YRect.sizeDelta.y);
+        void Start() { }
+        void Update() { }
+
+        public void Init(DataCardItem data)
+        {
+            float sizex = data.size.x;
+            float sizey = data.size.y;
+            float posx = data.position.x;
+            float posy = data.position.y;
+            thisRect = GetComponent<RectTransform>();
+            thisRect.sizeDelta = new Vector2(sizex, sizey);
+
+            nameText.text = data.name;
+            widthText.text = sizex.ToString();
+            heightText.text = sizey.ToString();
+
+            XText.text = posx == 0 ? "" : posx.ToString();
+            YText.text = posy == 0 ? "" : posy.ToString();
+
+            XRect.sizeDelta = new Vector2(posx, XRect.sizeDelta.y);
+            YRect.sizeDelta = new Vector2(posy, YRect.sizeDelta.y);
+        }
     }
 }
+

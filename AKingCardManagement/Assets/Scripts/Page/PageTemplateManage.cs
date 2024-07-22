@@ -157,7 +157,7 @@ namespace AKingCard
                 RectTransform newItemRect = newItem.GetComponent<RectTransform>();
                 newItemRect.localPosition = data.cardItems[i].position;
                 PreviewItem newItemPreview = newItem.GetComponent<PreviewItem>();
-                newItemPreview.Init(data.cardItems[i].size, data.cardItems[i].position);
+                newItemPreview.Init(data.cardItems[i]);
             }
 
             Vector2 contentSize = data.cardItems[0].size;

@@ -18,7 +18,10 @@ namespace AKingCard
             cardItems = new List<DataCardItem>();
             cardItems.Add(new CardItemImage(this, 0, "Background", size, Vector2.zero));
         }
-
+        public string toString()
+        {
+            return $"index:{this.index}, name:{this.name}, size:{size}, cardItems:{cardItems.Count}";
+        }
         public bool Equals(DataTemplate otherTemplate)
         {
             if (otherTemplate == null) return false;
