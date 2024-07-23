@@ -117,8 +117,6 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] CreateNewListItem");
             DataTemplate newData = new DataTemplate(UnityWebRequest.EscapeURL(Name), new Vector2(width, height));
-            newData.cardItems.Add(new CardItemImage(newData, 1, "test", new Vector2(100, 100), new Vector2(100, 100)));
-            newData.cardItems.Add(new CardItemImage(newData, 2, "test2", new Vector2(200, 200), new Vector2(300, 300)));
             cardTemplates.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemTemplate, scrollContent);
             newObject.transform.SetAsFirstSibling();

@@ -18,12 +18,14 @@ namespace AKingCard
         public DataCardItem thisData;
         private UnityAction<Transform, DataCardItem> onClickAction;
         private UnityAction setSortAction;
+        private UnityAction<GameObject> deleteAction;
         private Button thisButton;
-        public void Init(DataCardItem data, UnityAction SetSortAction, UnityAction<Transform, DataCardItem> OnClickAction)
+        public void Init(DataCardItem data, UnityAction SetSortAction, UnityAction<GameObject> DeleteAction, UnityAction<Transform, DataCardItem> OnClickAction)
         {
             thisData = data;
             onClickAction = OnClickAction;
             setSortAction = SetSortAction;
+            deleteAction = DeleteAction;
             textName.text = UnityWebRequest.UnEscapeURL(data.name);
             thisButton = GetComponent<Button>();
             thisButton.onClick.AddListener(OnClick);
@@ -51,11 +53,12 @@ namespace AKingCard
             int parentsChild = transform.parent.childCount;
             if (thisSiblingIndex < parentsChild - 1)
                 transform.SetSiblingIndex(thisSiblingIndex + 1);
-            setSortAction.Invoke();
+            setSortAction?.Invoke();
         }
         private void OnClickButtonDelete()
         {
-            LogManager.Log($"[{LogTag}] OnClickButtonDown");
+            LogManager.Log($"[{LogTag}] OnClickButtonDelete");
+            deleteAction?.Invoke(this.gameObject);
         }
     }
 

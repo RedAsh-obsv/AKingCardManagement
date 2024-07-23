@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 namespace AKingCard
@@ -10,7 +11,7 @@ namespace AKingCard
     public class PreviewItem : MonoBehaviour
     {
         private RectTransform thisRect;
-        public TextMeshProUGUI nameText;
+        public Text nameText;
         public TextMeshProUGUI widthText;
         public TextMeshProUGUI heightText;
 
@@ -32,7 +33,7 @@ namespace AKingCard
             thisRect = GetComponent<RectTransform>();
             thisRect.sizeDelta = new Vector2(sizex, sizey);
 
-            nameText.text = data.name;
+            nameText.text = UnityWebRequest.UnEscapeURL(data.name);
             widthText.text = sizex.ToString();
             heightText.text = sizey.ToString();
 

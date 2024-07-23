@@ -70,7 +70,9 @@ namespace AKingCard
             {
                 changeTimer = DateTime.Now;
                 if (currentTemplate != null && currentDataItem != null)
+                {
                     CheckChangeSaved();
+                }
             }
         }
 
@@ -210,7 +212,7 @@ namespace AKingCard
                 GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
                 newObject.transform.SetAsFirstSibling();
                 ListItemEditImage newListItemEditImage = newObject.GetComponent<ListItemEditImage>();
-                newListItemEditImage.Init(data.cardItems[i], UpdateCardItemSort, OnClickListItem);
+                newListItemEditImage.Init(data.cardItems[i], UpdateCardItemSort, DeleteCardItemSort, OnClickListItem);
                 PreviewItem newItemPreview = CreateNewPreViewItemImage(data.cardItems[i], previewRoot);
                 UIItemPairs.Add(data.cardItems[i].index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
             }
@@ -221,14 +223,13 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemImage");
             long nextIndex = currentTemplate.cardItems.Count;
-            CardItemImage newData = new CardItemImage(currentTemplate, nextIndex, UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
+            CardItemImage newData = new CardItemImage(nextIndex, UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
             currentTemplate.cardItems.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
             newObject.transform.SetAsFirstSibling();
             ListItemEditImage newListItemEditImage = newObject.GetComponent<ListItemEditImage>();
-            newListItemEditImage.Init(newData, UpdateCardItemSort, OnClickListItem);
-            scrollContentHighlight.position = newObject.transform.position;
-            scrollContentHighlight.localScale = Vector3.one;
+            newListItemEditImage.Init(newData, UpdateCardItemSort, DeleteCardItemSort, OnClickListItem);
+            scrollContentHighlight.localScale = Vector3.zero;
             PreviewItem newItemPreview = CreateNewPreViewItemImage(newData, previewRoot);
             UIItemPairs.Add(newData.index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
             //OnClickListItem(newObject.transform, newData);
@@ -249,7 +250,7 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] ShowConfigPanel");
             ConfigPanel.SetActive(true);
-            ConfigPanelName.text = itemData.name;
+            ConfigPanelName.text = UnityWebRequest.UnEscapeURL(itemData.name);
             ConfigPanelWidth.text = itemData.size.x.ToString();
             ConfigPanelHeight.text = itemData.size.y.ToString();
             ConfigPanelX.text = itemData.position.x.ToString();
@@ -275,7 +276,22 @@ namespace AKingCard
             currentTemplate.cardItems.Reverse();
             CreateNewTemplatePreView(currentTemplate);
             LoadSavedListItems(currentTemplate);
-
+        }
+        private void DeleteCardItemSort(GameObject deleteObj)
+        {
+            DestroyImmediate(deleteObj);
+            currentTemplate.cardItems.Clear();
+            if (scrollContent.childCount > 0)
+            {
+                foreach (Transform item in scrollContent)
+                {
+                    currentTemplate.cardItems.Add(item.GetComponent<ListItemEditImage>().thisData);
+                }
+            }
+            currentTemplate.cardItems.Reverse();
+            CreateNewTemplatePreView(currentTemplate);
+            LoadSavedListItems(currentTemplate);
+            HideConfigPanel();
         }
         private void CreateNewTemplatePreView(DataTemplate data)
         {
@@ -322,16 +338,16 @@ namespace AKingCard
             return newItemPreview;
         }
 
-        private void UpdateConfigPanel()
+        public void UpdateConfigPanel()
         {
             LogManager.Log($"[{LogTag}] UpdateConfigPanel");
 
             if (currentTemplate == null || currentDataItem == null)
                 return;
-            if (string.IsNullOrEmpty(ConfigPanelName.text))//Ãû×Ö
-                currentDataItem.name = ConfigPanelName.text;
+            if (!string.IsNullOrEmpty(ConfigPanelName.text))//Ãû×Ö
+                currentDataItem.name = UnityWebRequest.EscapeURL(ConfigPanelName.text);
             else
-                ConfigPanelName.text = currentDataItem.name;
+                ConfigPanelName.text = UnityWebRequest.UnEscapeURL(currentDataItem.name);
 
             if (intReg.IsMatch(ConfigPanelWidth.text))  //¿í
                 currentDataItem.size = new Vector2(Convert.ToInt32(ConfigPanelWidth.text), currentDataItem.size.y);
@@ -343,12 +359,12 @@ namespace AKingCard
             else
                 ConfigPanelHeight.text = currentDataItem.size.y.ToString();
 
-            if (intReg.IsMatch(ConfigPanelX.text))  //X
+            if (intReg.IsMatch(ConfigPanelX.text) || ConfigPanelX.text == "0")  //X
                 currentDataItem.position = new Vector2(Convert.ToInt32(ConfigPanelX.text), currentDataItem.position.y);
             else
                 ConfigPanelX.text = currentDataItem.position.x.ToString();
 
-            if (intReg.IsMatch(ConfigPanelY.text))  //Y
+            if (intReg.IsMatch(ConfigPanelY.text) || ConfigPanelX.text == "0")  //Y
                 currentDataItem.position = new Vector2(currentDataItem.position.x, Convert.ToInt32(ConfigPanelY.text));
             else
                 ConfigPanelY.text = currentDataItem.position.y.ToString();
@@ -360,6 +376,12 @@ namespace AKingCard
             }
             CreateNewTemplatePreView(currentTemplate);
             LoadSavedListItems(currentTemplate);
+        }
+
+        public void SaveTemplate()
+        {
+            string templateJsonString = JsonUtility.ToJson(currentTemplate);
+            LogManager.Log(templateJsonString);
         }
     }
 }
