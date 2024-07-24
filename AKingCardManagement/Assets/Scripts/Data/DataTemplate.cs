@@ -7,17 +7,17 @@ namespace AKingCard
     [Serializable]
     public class DataTemplate
     {
-        public long index;
+        public string index;
         public string name;
         public Vector2 size;
         public List<DataCardItem> cardItems;
         public DataTemplate(string name, Vector2 size)
         {
-            this.index = DateTime.Now.Ticks;
+            this.index = DateTime.Now.Ticks.ToString();
             this.name = name;
             this.size = size;
             cardItems = new List<DataCardItem>();
-            cardItems.Add(new CardItemImage(0, "Background", size, Vector2.zero));
+            cardItems.Add(new DataCardItemImage($"{this.index}000", "Background", size, Vector2.zero));
         }
         public string toString()
         {

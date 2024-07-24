@@ -15,6 +15,7 @@ namespace AKingCard
         public Button buttonUp;
         public Button buttonDown;
         public Button buttonDelete;
+        [HideInInspector]
         public DataCardItem thisData;
         private UnityAction<Transform, DataCardItem> onClickAction;
         private UnityAction setSortAction;

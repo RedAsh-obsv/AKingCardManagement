@@ -35,6 +35,12 @@ namespace AKingCard
             alertAdd.gameObject.SetActive(false);
             previewTextTitle.text = "-";
             previewTextSize.text = $"- x -";
+            List<DataTemplate> dataTemplates = SaveJsonManager.instance.ReadTemplates();
+            for (int i = 0; i < dataTemplates.Count; i++)
+            {
+                CreateNewListItem(dataTemplates[i]);
+            }
+
         }
 
         void Update() {
@@ -108,21 +114,22 @@ namespace AKingCard
                 return;
             }
 
-            CreateNewListItem(inputName.text, Convert.ToInt32(inputWidth.text), Convert.ToInt32(inputHeight.text));
+            DataTemplate newData = new DataTemplate(UnityWebRequest.EscapeURL(inputName.text), new Vector2(Convert.ToInt32(inputWidth.text), Convert.ToInt32(inputHeight.text)));
+            SaveJsonManager.instance.SaveTemplate(newData);
+            CreateNewListItem(newData);
 
             alertAdd.gameObject.SetActive(false);
         }
 
-        private void CreateNewListItem(string Name, int width, int height)
+        private void CreateNewListItem(DataTemplate newData)
         {
             LogManager.Log($"[{LogTag}] CreateNewListItem");
-            DataTemplate newData = new DataTemplate(UnityWebRequest.EscapeURL(Name), new Vector2(width, height));
             cardTemplates.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemTemplate, scrollContent);
             newObject.transform.SetAsFirstSibling();
-            newObject.GetComponent<ListItemTemplate>().Init(newData, OnClickListItem);
+            newObject.GetComponent<ListItemTemplate>().Init(newData, OnClickListItem, DeleteTemplateItemSort);
             newObject.GetComponent<Button>().Select();
-            OnClickListItem(newData);
+            //OnClickListItem(newData);
         }
 
         private void OnClickListItem(DataTemplate itemData)
@@ -133,17 +140,30 @@ namespace AKingCard
             previewTextSize.text = $"{itemData.size.x} x {itemData.size.y}";
             CreateNewTemplatePreView(itemData);
         }
-        
-        private void CreateNewTemplatePreView(DataTemplate data)
+        private void DeleteTemplateItemSort(GameObject deleteObj)
         {
-            LogManager.Log($"[{LogTag}] CreateNewTemplatePreView");
+            ListItemTemplate deleteItem = deleteObj.GetComponent<ListItemTemplate>();
+            SaveJsonManager.instance.DeleteTemplate(deleteItem.thisData);
+            DestroyImmediate(deleteObj);
+            ClearTemplatePreView();
+        }
+        private void ClearTemplatePreView()
+        {
+            LogManager.Log($"[{LogTag}] ClearTemplatePreView");
             if (previewParent.childCount != 0)
             {
-                foreach(Transform child in previewParent)
+                foreach (Transform child in previewParent)
                 {
                     Destroy(child.gameObject);
                 }
             }
+        }
+
+        private void CreateNewTemplatePreView(DataTemplate data)
+        {
+            LogManager.Log($"[{LogTag}] CreateNewTemplatePreView");
+            ClearTemplatePreView();
+            
             GameObject PreviewRoot = Instantiate(PrefabManager.instance.PreviewRoot, previewParent);
             
             RectTransform PreviewRootRect = PreviewRoot.GetComponent<RectTransform>();

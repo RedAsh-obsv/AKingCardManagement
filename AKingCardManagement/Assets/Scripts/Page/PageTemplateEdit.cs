@@ -45,13 +45,15 @@ namespace AKingCard
         public Animator toastWarning;
         public RectTransform toastWarningRect;
         public TextMeshProUGUI toastWarningText;
+        public GameObject WarningDot;
+        public GameObject WarningHint;
 
         private Regex intReg = new Regex("^[0-9]*[1-9][0-9]*$");
         private CardItemType addingItemType = CardItemType.Image;
 
         private DataTemplate currentTemplate;
         private DataCardItem currentDataItem;
-        private Dictionary<long, KeyValuePair<ListItemEdit, PreviewItem>> UIItemPairs = new Dictionary<long, KeyValuePair<ListItemEdit, PreviewItem>>();
+        private Dictionary<string, KeyValuePair<ListItemEdit, PreviewItem>> UIItemPairs = new Dictionary<string, KeyValuePair<ListItemEdit, PreviewItem>>();
         private bool changeHasSaved = false;
         private DateTime changeTimer;
         void Start()
@@ -107,10 +109,17 @@ namespace AKingCard
         public void CheckChangeSaved()//!!
         {
             //LogManager.Log($"[{LogTag}] CheckChangeSaved");
-            if (currentTemplate.Equals(currentTemplate))
+            DataTemplate savedTemplate = SaveJsonManager.instance.ReadTemplate(currentTemplate.index);
+            if (currentTemplate.Equals(savedTemplate))
+            {
                 changeHasSaved = true;
+                WarningDot.SetActive(false);
+            }
             else
+            {
                 changeHasSaved = false;
+                WarningDot.SetActive(true);
+            }
         }
 
         public void SaveChange()
@@ -223,7 +232,7 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemImage");
             long nextIndex = currentTemplate.cardItems.Count;
-            CardItemImage newData = new CardItemImage(nextIndex, UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
+            DataCardItemImage newData = new DataCardItemImage($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}", UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
             currentTemplate.cardItems.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
             newObject.transform.SetAsFirstSibling();
@@ -380,8 +389,7 @@ namespace AKingCard
 
         public void SaveTemplate()
         {
-            string templateJsonString = JsonUtility.ToJson(currentTemplate);
-            LogManager.Log(templateJsonString);
+            SaveJsonManager.instance.SaveTemplate(currentTemplate);
         }
     }
 }

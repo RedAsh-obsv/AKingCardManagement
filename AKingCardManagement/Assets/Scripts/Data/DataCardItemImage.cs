@@ -5,10 +5,10 @@ using UnityEngine.UI;
 
 namespace AKingCard
 {
-    public class CardItemImage : DataCardItem
+    public class DataCardItemImage : DataCardItem
     {
         private RawImage imageView;
-        public CardItemImage(long index, string name, Vector2 size, Vector2 position)
+        public DataCardItemImage(string index, string name, Vector2 size, Vector2 position)
         {
             this.index = index;
             this.name = name;
