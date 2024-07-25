@@ -1,6 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
@@ -35,6 +35,8 @@ namespace AKingCard
         public TMP_InputField ConfigPanelTexture;
         public Button ConfigPanelButtonTexture;
 
+        public Button ButtonInfoOn;
+        public Button ButtonInfoOff;
         public Transform alertAdd;
         public Button alertAddButtonImage;
         public Button alertAddButtonText;
@@ -53,6 +55,7 @@ namespace AKingCard
 
         private DataTemplate currentTemplate;
         private DataCardItem currentDataItem;
+        //index, ListItem, PreviewItem
         private Dictionary<string, KeyValuePair<ListItemEdit, PreviewItem>> UIItemPairs = new Dictionary<string, KeyValuePair<ListItemEdit, PreviewItem>>();
         private bool changeHasSaved = false;
         private DateTime changeTimer;
@@ -87,6 +90,8 @@ namespace AKingCard
             previewTextSize.text = $"{data.size.x} x {data.size.y}";
             ConfigPanel.SetActive(false);
             currentTemplate = data;
+            ButtonInfoOn.gameObject.SetActive(false);
+            ButtonInfoOff.gameObject.SetActive(true);
         } 
         public void ShowAlertBack()
         {
@@ -106,7 +111,27 @@ namespace AKingCard
             else
                 ShowAlertBack();
         }
-        public void CheckChangeSaved()//!!
+
+
+        public void OpenTexture()
+        {
+            string texturePath =  FileDialogManager.instance.OpenFile();
+            if (!string.IsNullOrEmpty(texturePath))
+            {
+                FileInfo textureInfo = new FileInfo(texturePath);
+                if (textureInfo.Extension != ".png" && textureInfo.Extension != ".jpg" && textureInfo.Extension != ".jpeg")
+                {
+                    toastWarningText.SetText("目前仅支持.png/.jpg./jpeg格式的图片");
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(toastWarningRect);
+                    toastWarning.Play("TemplateAlertAddToastClosing", 0, 0);
+                }
+                else
+                {
+                    ConfigPanelTexture.text = texturePath;
+                }
+            }
+        }
+        public void CheckChangeSaved()
         {
             //LogManager.Log($"[{LogTag}] CheckChangeSaved");
             DataTemplate savedTemplate = SaveJsonManager.instance.ReadTemplate(currentTemplate.index);
@@ -121,10 +146,23 @@ namespace AKingCard
                 WarningDot.SetActive(true);
             }
         }
-
-        public void SaveChange()
+        public void InfoOn()
         {
-
+            foreach(var itemPair in UIItemPairs)
+            {
+                itemPair.Value.Value.InfoOn();
+            }
+            ButtonInfoOn.gameObject.SetActive(false);
+            ButtonInfoOff.gameObject.SetActive(true);
+        }
+        public void InfoOff()
+        {
+            foreach (var itemPair in UIItemPairs)
+            {
+                itemPair.Value.Value.InfoOff();
+            }
+            ButtonInfoOn.gameObject.SetActive(true);
+            ButtonInfoOff.gameObject.SetActive(false);
         }
 
         public void ShowAlertAdd()
@@ -378,7 +416,12 @@ namespace AKingCard
             else
                 ConfigPanelY.text = currentDataItem.position.y.ToString();
 
-            for(int i=0;i< currentTemplate.cardItems.Count; i++)
+            if (!string.IsNullOrEmpty(ConfigPanelTexture.text))//示例图片
+            {
+                currentDataItem.content = ConfigPanelTexture.text;
+            }
+
+                for (int i=0;i< currentTemplate.cardItems.Count; i++)
             {
                 if (currentTemplate.cardItems[i].index == currentDataItem.index)
                     currentTemplate.cardItems[i] = currentDataItem;

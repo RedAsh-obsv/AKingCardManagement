@@ -11,6 +11,9 @@ namespace AKingCard
     public class PreviewItem : MonoBehaviour
     {
         private RectTransform thisRect;
+        private DataCardItem thisData;
+        public RawImage texture;
+        public RectTransform FrontView;
         public Text nameText;
         public TextMeshProUGUI widthText;
         public TextMeshProUGUI heightText;
@@ -26,6 +29,7 @@ namespace AKingCard
 
         public void Init(DataCardItem data)
         {
+            thisData = data;
             float sizex = data.size.x;
             float sizey = data.size.y;
             float posx = data.position.x;
@@ -42,6 +46,52 @@ namespace AKingCard
 
             XRect.sizeDelta = new Vector2(posx, XRect.sizeDelta.y);
             YRect.sizeDelta = new Vector2(posy, YRect.sizeDelta.y);
+            if (!string.IsNullOrEmpty(data.content))
+            {
+                texture.enabled = true;
+                StartCoroutine(LoadTexture(data.content));
+            }
+            else
+            {
+                texture.enabled = false;
+            }
+        }
+        private IEnumerator LoadTexture(string path)
+        {
+            WWW www = new WWW("file://" + path);
+            yield return www;
+
+            if (!string.IsNullOrEmpty(www.error))
+            {
+                LogManager.Log("Load Image Error " + www.error);
+                yield break;
+            }
+
+            yield return texture.texture = www.texture;
+        }
+
+        public void InfoOn()
+        {
+            nameText.gameObject.SetActive(true);
+            widthText.gameObject.SetActive(true);
+            heightText.gameObject.SetActive(true);
+            XRect.gameObject.SetActive(true);
+            YRect.gameObject.SetActive(true);
+            XText.gameObject.SetActive(true);
+            YText.gameObject.SetActive(true);
+            FrontView.gameObject.SetActive(true);
+            Init(thisData);
+        }
+        public void InfoOff()
+        {
+            nameText.gameObject.SetActive(false);
+            widthText.gameObject.SetActive(false);
+            heightText.gameObject.SetActive(false);
+            XRect.gameObject.SetActive(false);
+            YRect.gameObject.SetActive(false);
+            XText.gameObject.SetActive(false);
+            YText.gameObject.SetActive(false);
+            FrontView.gameObject.SetActive(false);
         }
     }
 }
