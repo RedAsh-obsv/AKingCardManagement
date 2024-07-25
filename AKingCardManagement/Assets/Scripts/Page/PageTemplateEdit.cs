@@ -270,7 +270,7 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemImage");
             long nextIndex = currentTemplate.cardItems.Count;
-            DataCardItemImage newData = new DataCardItemImage($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}", UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
+            DataCardItem newData = new DataCardItem($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}",DataCardItemType.Image, UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
             currentTemplate.cardItems.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
             newObject.transform.SetAsFirstSibling();
@@ -302,7 +302,7 @@ namespace AKingCard
             ConfigPanelHeight.text = itemData.size.y.ToString();
             ConfigPanelX.text = itemData.position.x.ToString();
             ConfigPanelY.text = itemData.position.y.ToString();
-            ConfigPanelTexture.text = itemData.content;
+            ConfigPanelTexture.text = itemData.texturePath;
         }
         public void HideConfigPanel()
         {
@@ -418,7 +418,7 @@ namespace AKingCard
 
             if (!string.IsNullOrEmpty(ConfigPanelTexture.text))//Ê¾ÀýÍ¼Æ¬
             {
-                currentDataItem.content = ConfigPanelTexture.text;
+                currentDataItem.texturePath = ConfigPanelTexture.text;
             }
 
                 for (int i=0;i< currentTemplate.cardItems.Count; i++)

@@ -13,6 +13,7 @@ namespace AKingCard
         private RectTransform thisRect;
         private DataCardItem thisData;
         public RawImage texture;
+        public Text text;
         public RectTransform FrontView;
         public Text nameText;
         public TextMeshProUGUI widthText;
@@ -46,10 +47,10 @@ namespace AKingCard
 
             XRect.sizeDelta = new Vector2(posx, XRect.sizeDelta.y);
             YRect.sizeDelta = new Vector2(posy, YRect.sizeDelta.y);
-            if (!string.IsNullOrEmpty(data.content))
+            if (!string.IsNullOrEmpty(data.texturePath))
             {
                 texture.enabled = true;
-                StartCoroutine(LoadTexture(data.content));
+                StartCoroutine(LoadTexture(data.texturePath));
             }
             else
             {
