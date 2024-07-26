@@ -54,7 +54,7 @@ namespace AKingCard
         private CardItemType addingItemType = CardItemType.Image;
 
         private DataTemplate currentTemplate;
-        private DataCardItem currentDataItem;
+        private DataTemplateItem currentDataItem;
         //index, ListItem, PreviewItem
         private Dictionary<string, KeyValuePair<ListItemEdit, PreviewItem>> UIItemPairs = new Dictionary<string, KeyValuePair<ListItemEdit, PreviewItem>>();
         private bool changeHasSaved = false;
@@ -270,7 +270,7 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemImage");
             long nextIndex = currentTemplate.cardItems.Count;
-            DataCardItem newData = new DataCardItem($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}",DataCardItemType.Image, UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
+            DataTemplateItem newData = new DataTemplateItem($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}", UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
             currentTemplate.cardItems.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
             newObject.transform.SetAsFirstSibling();
@@ -285,7 +285,7 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemText");
         }
-        private void OnClickListItem(Transform transObj, DataCardItem itemData)
+        private void OnClickListItem(Transform transObj, DataTemplateItem itemData)
         {
             LogManager.Log($"[{LogTag}] OnClickListItem");
             scrollContentHighlight.position = transObj.position;
@@ -293,7 +293,7 @@ namespace AKingCard
             currentDataItem = itemData;
             ShowConfigPanel(itemData);
         }
-        private void ShowConfigPanel(DataCardItem itemData)
+        private void ShowConfigPanel(DataTemplateItem itemData)
         {
             LogManager.Log($"[{LogTag}] ShowConfigPanel");
             ConfigPanel.SetActive(true);
@@ -373,7 +373,7 @@ namespace AKingCard
             }
         }
 
-        private PreviewItem CreateNewPreViewItemImage(DataCardItem itemData, RectTransform parent)
+        private PreviewItem CreateNewPreViewItemImage(DataTemplateItem itemData, RectTransform parent)
         {
             LogManager.Log($"[{LogTag}] CreateNewPreViewItemImage");
             GameObject newItem = Instantiate(PrefabManager.instance.PreviewItem, parent);

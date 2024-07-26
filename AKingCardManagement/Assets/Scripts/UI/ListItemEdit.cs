@@ -16,12 +16,12 @@ namespace AKingCard
         public Button buttonDown;
         public Button buttonDelete;
         [HideInInspector]
-        public DataCardItem thisData;
-        private UnityAction<Transform, DataCardItem> onClickAction;
+        public DataTemplateItem thisData;
+        private UnityAction<Transform, DataTemplateItem> onClickAction;
         private UnityAction setSortAction;
         private UnityAction<GameObject> deleteAction;
         private Button thisButton;
-        public void Init(DataCardItem data, UnityAction SetSortAction, UnityAction<GameObject> DeleteAction, UnityAction<Transform, DataCardItem> OnClickAction)
+        public void Init(DataTemplateItem data, UnityAction SetSortAction, UnityAction<GameObject> DeleteAction, UnityAction<Transform, DataTemplateItem> OnClickAction)
         {
             thisData = data;
             onClickAction = OnClickAction;

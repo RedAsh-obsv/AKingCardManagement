@@ -10,14 +10,14 @@ namespace AKingCard
         public string index;
         public string name;
         public Vector2 size;
-        public List<DataCardItem> cardItems;
+        public List<DataTemplateItem> cardItems;
         public DataTemplate(string name, Vector2 size)
         {
             this.index = DateTime.Now.Ticks.ToString();
             this.name = name;
             this.size = size;
-            cardItems = new List<DataCardItem>();
-            cardItems.Add(new DataCardItem($"{this.index}000" ,DataCardItemType.Image, "Background", size, Vector2.zero));
+            cardItems = new List<DataTemplateItem>();
+            cardItems.Add(new DataTemplateItem($"{this.index}000" , "Background", size, Vector2.zero));
         }
         public string toString()
         {
@@ -26,11 +26,10 @@ namespace AKingCard
         public bool Equals(DataTemplate otherTemplate)
         {
             if (otherTemplate == null) return false;
-            if (otherTemplate.index != index) return false;
-            if (otherTemplate.name != name) return false;
-            if (otherTemplate.size != size) return false;
-            if (otherTemplate.index != index) return false;
-            if (otherTemplate.cardItems.Count != cardItems.Count) return false;
+            if (!otherTemplate.index.Equals(index)) return false;
+            if (!otherTemplate.name.Equals(name)) return false;
+            if (!otherTemplate.size.Equals(size)) return false;
+            if (!otherTemplate.cardItems.Count.Equals(cardItems.Count)) return false;
             else
             {
                 for (int i = 0; i < otherTemplate.cardItems.Count; i++)

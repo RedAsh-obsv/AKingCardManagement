@@ -11,7 +11,7 @@ namespace AKingCard
     public class PreviewItem : MonoBehaviour
     {
         private RectTransform thisRect;
-        private DataCardItem thisData;
+        private DataTemplateItem thisData;
         public RawImage texture;
         public Text text;
         public RectTransform FrontView;
@@ -28,7 +28,7 @@ namespace AKingCard
         void Start() { }
         void Update() { }
 
-        public void Init(DataCardItem data)
+        public void Init(DataTemplateItem data)
         {
             thisData = data;
             float sizex = data.size.x;
