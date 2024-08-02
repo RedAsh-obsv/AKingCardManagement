@@ -10,7 +10,7 @@ namespace AKingCard
         public string index;
         public string name;
         public DataTemplate thisTemplate;
-        public List<DataTemplateItem> items;
+        public List<DataTemplateItemImage> items;
         public DataCard(string name, DataTemplate template)
         {
             this.index = template + DateTime.Now.Ticks.ToString();

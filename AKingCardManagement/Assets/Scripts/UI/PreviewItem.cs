@@ -47,14 +47,21 @@ namespace AKingCard
 
             XRect.sizeDelta = new Vector2(posx, XRect.sizeDelta.y);
             YRect.sizeDelta = new Vector2(posy, YRect.sizeDelta.y);
-            if (!string.IsNullOrEmpty(data.texturePath))
+            if(data.type == DataTemplateItemType.Image)
             {
-                texture.enabled = true;
-                StartCoroutine(LoadTexture(data.texturePath));
+                if (!string.IsNullOrEmpty(((DataTemplateItemImage)data).texturePath))
+                {
+                    texture.enabled = true;
+                    StartCoroutine(LoadTexture(((DataTemplateItemImage)data).texturePath));
+                }
+                else
+                {
+                    texture.enabled = false;
+                }
             }
-            else
+            else if (data.type == DataTemplateItemType.Text)
             {
-                texture.enabled = false;
+
             }
         }
         private IEnumerator LoadTexture(string path)

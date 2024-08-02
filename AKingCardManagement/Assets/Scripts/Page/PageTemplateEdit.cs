@@ -26,14 +26,31 @@ namespace AKingCard
         public RectTransform previewRoot;
         public TextMeshProUGUI previewTextTitle;
         public TextMeshProUGUI previewTextSize;
-        public GameObject ConfigPanel;
-        public TMP_InputField ConfigPanelName;
-        public TMP_InputField ConfigPanelWidth;
-        public TMP_InputField ConfigPanelHeight;
-        public TMP_InputField ConfigPanelX;
-        public TMP_InputField ConfigPanelY;
-        public TMP_InputField ConfigPanelTexture;
-        public Button ConfigPanelButtonTexture;
+
+        public GameObject ConfigPanelImage;
+        public TMP_InputField ConfigPanelImageName;
+        public TMP_InputField ConfigPanelImageWidth;
+        public TMP_InputField ConfigPanelImageHeight;
+        public TMP_InputField ConfigPanelImageX;
+        public TMP_InputField ConfigPanelImageY;
+        public TMP_InputField ConfigPanelImageTexture;
+        public Button ConfigPanelImageButtonTexture;
+        
+        public GameObject ConfigPanelText;
+        public TMP_InputField ConfigPanelTextName;
+        public TMP_InputField ConfigPanelTextWidth;
+        public TMP_InputField ConfigPanelTextHeight;
+        public TMP_InputField ConfigPanelTextX;
+        public TMP_InputField ConfigPanelTextY;
+        public TMP_InputField ConfigPanelTextFont;
+        public Button ConfigPanelTextButtonFont;
+        public TMP_InputField ConfigPanelTextSize;
+        public TMP_InputField ConfigPanelTextColor;
+        public TMP_InputField ConfigPanelTextContent;
+        public Button ConfigPanelTextButtonLeft;
+        public Button ConfigPanelTextButtonCenter;
+        public Button ConfigPanelTextButtonRight;
+        public RectTransform ConfigPanelTextButtonHighlight;
 
         public Button ButtonInfoOn;
         public Button ButtonInfoOff;
@@ -88,7 +105,7 @@ namespace AKingCard
             LoadSavedListItems(data);
             previewTextTitle.text = UnityWebRequest.UnEscapeURL(data.name);
             previewTextSize.text = $"{data.size.x} x {data.size.y}";
-            ConfigPanel.SetActive(false);
+            ConfigPanelImage.SetActive(false);
             currentTemplate = data;
             ButtonInfoOn.gameObject.SetActive(false);
             ButtonInfoOff.gameObject.SetActive(true);
@@ -127,7 +144,7 @@ namespace AKingCard
                 }
                 else
                 {
-                    ConfigPanelTexture.text = texturePath;
+                    ConfigPanelImageTexture.text = texturePath;
                 }
             }
         }
@@ -260,7 +277,7 @@ namespace AKingCard
                 newObject.transform.SetAsFirstSibling();
                 ListItemEditImage newListItemEditImage = newObject.GetComponent<ListItemEditImage>();
                 newListItemEditImage.Init(data.cardItems[i], UpdateCardItemSort, DeleteCardItemSort, OnClickListItem);
-                PreviewItem newItemPreview = CreateNewPreViewItemImage(data.cardItems[i], previewRoot);
+                PreviewItem newItemPreview = CreateNewPreViewItem(data.cardItems[i], previewRoot);
                 UIItemPairs.Add(data.cardItems[i].index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
             }
             scrollContentHighlight.localScale = Vector3.zero;
@@ -270,14 +287,14 @@ namespace AKingCard
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemImage");
             long nextIndex = currentTemplate.cardItems.Count;
-            DataTemplateItem newData = new DataTemplateItem($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}", UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
+            DataTemplateItemImage newData = new DataTemplateItemImage($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}", UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
             currentTemplate.cardItems.Add(newData);
             GameObject newObject = Instantiate(PrefabManager.instance.ListItemImage, scrollContent);
             newObject.transform.SetAsFirstSibling();
             ListItemEditImage newListItemEditImage = newObject.GetComponent<ListItemEditImage>();
             newListItemEditImage.Init(newData, UpdateCardItemSort, DeleteCardItemSort, OnClickListItem);
             scrollContentHighlight.localScale = Vector3.zero;
-            PreviewItem newItemPreview = CreateNewPreViewItemImage(newData, previewRoot);
+            PreviewItem newItemPreview = CreateNewPreViewItem(newData, previewRoot);
             UIItemPairs.Add(newData.index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditImage, newItemPreview));
             //OnClickListItem(newObject.transform, newData);
         }
@@ -291,23 +308,56 @@ namespace AKingCard
             scrollContentHighlight.position = transObj.position;
             scrollContentHighlight.localScale = Vector3.one;
             currentDataItem = itemData;
-            ShowConfigPanel(itemData);
+            if (itemData.GetType() == typeof(DataTemplateItemImage))
+                ShowConfigPanelImage((DataTemplateItemImage)itemData);
+            if (itemData.GetType() == typeof(DataTemplateItemText))
+                ShowConfigPanelText((DataTemplateItemText)itemData);
         }
-        private void ShowConfigPanel(DataTemplateItem itemData)
+        private void ShowConfigPanelImage(DataTemplateItemImage itemData)
         {
-            LogManager.Log($"[{LogTag}] ShowConfigPanel");
-            ConfigPanel.SetActive(true);
-            ConfigPanelName.text = UnityWebRequest.UnEscapeURL(itemData.name);
-            ConfigPanelWidth.text = itemData.size.x.ToString();
-            ConfigPanelHeight.text = itemData.size.y.ToString();
-            ConfigPanelX.text = itemData.position.x.ToString();
-            ConfigPanelY.text = itemData.position.y.ToString();
-            ConfigPanelTexture.text = itemData.texturePath;
+            LogManager.Log($"[{LogTag}] ShowConfigPanelImage");
+            ConfigPanelImage.SetActive(true);
+            ConfigPanelText.SetActive(false);
+            ConfigPanelImageName.text = UnityWebRequest.UnEscapeURL(itemData.name);
+            ConfigPanelImageWidth.text = itemData.size.x.ToString();
+            ConfigPanelImageHeight.text = itemData.size.y.ToString();
+            ConfigPanelImageX.text = itemData.position.x.ToString();
+            ConfigPanelImageY.text = itemData.position.y.ToString();
+            ConfigPanelImageTexture.text = itemData.texturePath;
+        }
+        private void ShowConfigPanelText(DataTemplateItemText itemData)
+        {
+            LogManager.Log($"[{LogTag}] ShowConfigPanelText");
+            ConfigPanelText.SetActive(true);
+            ConfigPanelText.SetActive(false);
+            ConfigPanelTextName.text = UnityWebRequest.UnEscapeURL(itemData.name);
+            ConfigPanelTextWidth.text = itemData.size.x.ToString();
+            ConfigPanelTextHeight.text = itemData.size.y.ToString();
+            ConfigPanelTextX.text = itemData.position.x.ToString();
+            ConfigPanelTextY.text = itemData.position.y.ToString();
+            ConfigPanelTextFont.text = itemData.fontPath;
+
+            ConfigPanelTextContent.text = itemData.textContent;
+            ConfigPanelTextSize.text = itemData.textSize.ToString();
+            ConfigPanelTextColor.text = "#"+ColorUtility.ToHtmlStringRGBA(itemData.textColor);
+            switch (itemData.align)
+            {
+                case DataTemplateItemAlign.Left:
+                    ConfigPanelTextButtonHighlight.position = ConfigPanelTextButtonLeft.gameObject.transform.position;
+                    break;
+                case DataTemplateItemAlign.Center:
+                    ConfigPanelTextButtonHighlight.position = ConfigPanelTextButtonCenter.gameObject.transform.position;
+                    break;
+                case DataTemplateItemAlign.Right:
+                    ConfigPanelTextButtonHighlight.position = ConfigPanelTextButtonRight.gameObject.transform.position;
+                    break;
+            }
         }
         public void HideConfigPanel()
         {
-            LogManager.Log($"[{LogTag}] ShowConfigPanel");
-            ConfigPanel.SetActive(false);
+            LogManager.Log($"[{LogTag}] HideConfigPanel");
+            ConfigPanelImage.SetActive(false);
+            ConfigPanelText.SetActive(false);
             scrollContentHighlight.localScale = Vector3.zero;
         }
         private void UpdateCardItemSort()
@@ -373,7 +423,7 @@ namespace AKingCard
             }
         }
 
-        private PreviewItem CreateNewPreViewItemImage(DataTemplateItem itemData, RectTransform parent)
+        private PreviewItem CreateNewPreViewItem(DataTemplateItem itemData, RectTransform parent)
         {
             LogManager.Log($"[{LogTag}] CreateNewPreViewItemImage");
             GameObject newItem = Instantiate(PrefabManager.instance.PreviewItem, parent);
@@ -385,40 +435,41 @@ namespace AKingCard
             return newItemPreview;
         }
 
-        public void UpdateConfigPanel()
+        public void UpdateConfigPanelImage()
         {
-            LogManager.Log($"[{LogTag}] UpdateConfigPanel");
+            LogManager.Log($"[{LogTag}] UpdateConfigPanelImage");
 
             if (currentTemplate == null || currentDataItem == null)
                 return;
-            if (!string.IsNullOrEmpty(ConfigPanelName.text))//Ãû×Ö
-                currentDataItem.name = UnityWebRequest.EscapeURL(ConfigPanelName.text);
-            else
-                ConfigPanelName.text = UnityWebRequest.UnEscapeURL(currentDataItem.name);
 
-            if (intReg.IsMatch(ConfigPanelWidth.text))  //¿í
-                currentDataItem.size = new Vector2(Convert.ToInt32(ConfigPanelWidth.text), currentDataItem.size.y);
+            if (!string.IsNullOrEmpty(ConfigPanelImageName.text))//Ãû×Ö
+                currentDataItem.name = UnityWebRequest.EscapeURL(ConfigPanelImageName.text);
             else
-                ConfigPanelWidth.text = currentDataItem.size.x.ToString();
+                ConfigPanelImageName.text = UnityWebRequest.UnEscapeURL(currentDataItem.name);
 
-            if (intReg.IsMatch(ConfigPanelHeight.text))  //¸ß
-                currentDataItem.size = new Vector2(currentDataItem.size.x, Convert.ToInt32(ConfigPanelHeight.text));
+            if (intReg.IsMatch(ConfigPanelImageWidth.text))  //¿í
+                currentDataItem.size = new Vector2(Convert.ToInt32(ConfigPanelImageWidth.text), currentDataItem.size.y);
             else
-                ConfigPanelHeight.text = currentDataItem.size.y.ToString();
+                ConfigPanelImageWidth.text = currentDataItem.size.x.ToString();
 
-            if (intReg.IsMatch(ConfigPanelX.text) || ConfigPanelX.text == "0")  //X
-                currentDataItem.position = new Vector2(Convert.ToInt32(ConfigPanelX.text), currentDataItem.position.y);
+            if (intReg.IsMatch(ConfigPanelImageHeight.text))  //¸ß
+                currentDataItem.size = new Vector2(currentDataItem.size.x, Convert.ToInt32(ConfigPanelImageHeight.text));
             else
-                ConfigPanelX.text = currentDataItem.position.x.ToString();
+                ConfigPanelImageHeight.text = currentDataItem.size.y.ToString();
 
-            if (intReg.IsMatch(ConfigPanelY.text) || ConfigPanelX.text == "0")  //Y
-                currentDataItem.position = new Vector2(currentDataItem.position.x, Convert.ToInt32(ConfigPanelY.text));
+            if (intReg.IsMatch(ConfigPanelImageX.text) || ConfigPanelImageX.text == "0")  //X
+                currentDataItem.position = new Vector2(Convert.ToInt32(ConfigPanelImageX.text), currentDataItem.position.y);
             else
-                ConfigPanelY.text = currentDataItem.position.y.ToString();
+                ConfigPanelImageX.text = currentDataItem.position.x.ToString();
 
-            if (!string.IsNullOrEmpty(ConfigPanelTexture.text))//Ê¾ÀýÍ¼Æ¬
+            if (intReg.IsMatch(ConfigPanelImageY.text) || ConfigPanelImageX.text == "0")  //Y
+                currentDataItem.position = new Vector2(currentDataItem.position.x, Convert.ToInt32(ConfigPanelImageY.text));
+            else
+                ConfigPanelImageY.text = currentDataItem.position.y.ToString();
+
+            if (!string.IsNullOrEmpty(ConfigPanelImageTexture.text))//Ê¾ÀýÍ¼Æ¬
             {
-                currentDataItem.texturePath = ConfigPanelTexture.text;
+                ((DataTemplateItemImage)currentDataItem).texturePath = ConfigPanelImageTexture.text;
             }
 
                 for (int i=0;i< currentTemplate.cardItems.Count; i++)

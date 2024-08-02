@@ -359,7 +359,7 @@ MonoBehaviour:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     m_PressedColor: {r: 0.25, g: 0.25, b: 0.25, a: 1}
-    m_SelectedColor: {r: 0.7279459, g: 0.5502314, b: 0.9056604, a: 1}
+    m_SelectedColor: {r: 0.7209793, g: 0.6479174, b: 0.7924528, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -402,7 +402,7 @@ MonoBehaviour:
       name: Background
       size: {x: 1, y: 1}
       position: {x: 0, y: 0}
-      content: 
+      texturePath: 
 --- !u!1 &925357659539887416
 GameObject:
   m_ObjectHideFlags: 0

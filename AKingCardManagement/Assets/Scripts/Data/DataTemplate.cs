@@ -17,7 +17,7 @@ namespace AKingCard
             this.name = name;
             this.size = size;
             cardItems = new List<DataTemplateItem>();
-            cardItems.Add(new DataTemplateItem($"{this.index}000" , "Background", size, Vector2.zero));
+            cardItems.Add(new DataTemplateItemImage($"{this.index}000" , "Background", size, Vector2.zero));
         }
         public string toString()
         {
