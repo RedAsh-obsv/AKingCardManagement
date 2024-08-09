@@ -12,8 +12,8 @@ namespace AKingCard
     {
         private RectTransform thisRect;
         private DataTemplateItem thisData;
-        public RawImage texture;
-        public Text text;
+        public RawImage thisTexture;
+        public Text thisText;
         public RectTransform FrontView;
         public Text nameText;
         public TextMeshProUGUI widthText;
@@ -49,19 +49,48 @@ namespace AKingCard
             YRect.sizeDelta = new Vector2(posy, YRect.sizeDelta.y);
             if(data.type == DataTemplateItemType.Image)
             {
-                if (!string.IsNullOrEmpty(((DataTemplateItemImage)data).texturePath))
+                DataTemplateItemImage imageData = (DataTemplateItemImage)data;
+                if (!string.IsNullOrEmpty(imageData.texturePath))
                 {
-                    texture.enabled = true;
+                    thisTexture.enabled = true;
+                    thisText.enabled = false;
                     StartCoroutine(LoadTexture(((DataTemplateItemImage)data).texturePath));
                 }
                 else
                 {
-                    texture.enabled = false;
+                    thisTexture.enabled = true;
+                    thisText.enabled = false;
                 }
             }
             else if (data.type == DataTemplateItemType.Text)
             {
-
+                DataTemplateItemText textData = (DataTemplateItemText)data;
+                if (!string.IsNullOrEmpty(textData.fontPath))
+                {
+                    thisTexture.enabled = true;
+                    thisText.enabled = false;
+                    Font BuildInFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                    thisText.fontSize = textData.textSize;
+                    thisText.color = textData.textColor;
+                    thisText.text = textData.textContent;
+                    switch (textData.align)
+                    {
+                        case DataTemplateItemAlign.Left:
+                            thisText.alignment = TextAnchor.UpperLeft;
+                            break;
+                        case DataTemplateItemAlign.Center:
+                            thisText.alignment = TextAnchor.UpperCenter;
+                            break;
+                        case DataTemplateItemAlign.Right:
+                            thisText.alignment = TextAnchor.UpperRight;
+                            break;
+                    }
+                }
+                else
+                {
+                    thisTexture.enabled = true;
+                    thisText.enabled = false;
+                }
             }
         }
         private IEnumerator LoadTexture(string path)
@@ -75,7 +104,11 @@ namespace AKingCard
                 yield break;
             }
 
-            yield return texture.texture = www.texture;
+            yield return thisTexture.texture = www.texture;
+        }
+        private IEnumerator LoadFont(string path)
+        {
+            yield return 0;
         }
 
         public void InfoOn()

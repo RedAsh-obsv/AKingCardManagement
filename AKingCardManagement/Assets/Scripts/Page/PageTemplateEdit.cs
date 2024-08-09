@@ -301,6 +301,16 @@ namespace AKingCard
         private void CreateNewListItemText(string Name, int width, int height)
         {
             LogManager.Log($"[{LogTag}] CreateNewListItemText");
+            long nextIndex = currentTemplate.cardItems.Count;
+            DataTemplateItemText newData = new DataTemplateItemText($"{currentTemplate.index}{nextIndex.ToString().PadLeft(3, '0')}", UnityWebRequest.EscapeURL(Name), new Vector2(width, height), Vector2.zero);
+            currentTemplate.cardItems.Add(newData);
+            GameObject newObject = Instantiate(PrefabManager.instance.ListItemText, scrollContent);
+            newObject.transform.SetAsFirstSibling();
+            ListItemEditText newListItemEditText = newObject.GetComponent<ListItemEditText>();
+            newListItemEditText.Init(newData, UpdateCardItemSort, DeleteCardItemSort, OnClickListItem);
+            scrollContentHighlight.localScale = Vector3.zero;
+            PreviewItem newItemPreview = CreateNewPreViewItem(newData, previewRoot);
+            UIItemPairs.Add(newData.index, new KeyValuePair<ListItemEdit, PreviewItem>(newListItemEditText, newItemPreview));
         }
         private void OnClickListItem(Transform transObj, DataTemplateItem itemData)
         {
@@ -425,7 +435,7 @@ namespace AKingCard
 
         private PreviewItem CreateNewPreViewItem(DataTemplateItem itemData, RectTransform parent)
         {
-            LogManager.Log($"[{LogTag}] CreateNewPreViewItemImage");
+            LogManager.Log($"[{LogTag}] CreateNewPreViewItem");
             GameObject newItem = Instantiate(PrefabManager.instance.PreviewItem, parent);
             RectTransform newItemRect = newItem.GetComponent<RectTransform>();
             newItemRect.localPosition = itemData.position;
